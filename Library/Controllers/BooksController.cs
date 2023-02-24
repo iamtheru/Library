@@ -1,4 +1,4 @@
-﻿using Library.Configuration;
+using Library.Configuration;
 using Library.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -99,7 +99,7 @@ namespace Library.Controllers
 			{
 				return NotFound();
 			}
-
+      
 			return Ok(new RatingCreated { Id = ratingId });
 		}
 	}
