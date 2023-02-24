@@ -1,9 +1,12 @@
-﻿using Library.Configuration;
+using Library.Configuration;
+using Library.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.Interfaces;
+using Shared;
 using Shared.DTO.Incoming;
 using Shared.DTO.Outcoming;
+using System.ComponentModel.DataAnnotations;
 
 namespace Library.Controllers
 {
@@ -22,20 +25,20 @@ namespace Library.Controllers
 		}
 
 		[HttpGet()]
+		[GetAllBooksFilterAttribute(typeof(SortState.BookOrder))]
 		public async Task<ActionResult<IEnumerable<BookResponse>>> GetAllBooks([FromQuery] string order)
 		{
-
 			var books = await _bookService.GetAllBooksAsync(order);
 
 			return Ok(books);
 		}
 
 		[HttpGet("{id}")]
-		public async Task<IActionResult> GetBookDetails(int id)
+		public async Task<IActionResult> GetBookDetails([Required] int id)
 		{
 			var bookDetails = await _bookService.GetBookDetailsAsync(id);
 
-			if (bookDetails.Id ==  -1)
+			if (bookDetails.Id == -1)
 			{
 				return NotFound();
 			}
@@ -44,7 +47,7 @@ namespace Library.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> DeleteBook(int id, [FromQuery] string secret)
+		public async Task<IActionResult> DeleteBook([Required] int id, [FromQuery] string secret)
 		{
 			if (secret != _configuration.SecretKey)
 			{
@@ -53,7 +56,7 @@ namespace Library.Controllers
 
 			var result = await _bookService.DeleteBookAsync(id);
 
-			if (result ==  -1)
+			if (result == -1)
 			{
 				return NotFound();
 			}
@@ -66,38 +69,38 @@ namespace Library.Controllers
 		{
 			var storedBookId = await _bookService.AddBookAsync(book);
 
-			if(storedBookId ==  -1)
+			if (storedBookId == -1)
 			{
 				return NotFound();
 			}
 
-			return Ok(new BookCreated { Id = storedBookId});
+			return Ok(new BookCreated { Id = storedBookId });
 		}
 
 		[HttpPut("{id}/review")]
-		public async Task<ActionResult<int>> SaveBookReview(int id, [FromBody] ReviewPut review)
+		public async Task<ActionResult<int>> SaveBookReview([Required] int id, [FromBody] ReviewPut review)
 		{
 			var reviewId = await _bookService.AddReviewAsync(id, review);
 
-			if (reviewId ==  -1)
+			if (reviewId == -1)
 			{
 				return NotFound();
 			}
 
-			return Ok(new ReviewCreated { Id = reviewId});
+			return Ok(new ReviewCreated { Id = reviewId });
 		}
 
 		[HttpPut("{id}/rate")]
-		public async Task<ActionResult<int>> RateBook(int id, [FromBody] RatingPut ratingModel)
+		public async Task<ActionResult<int>> RateBook([Required] int id, [FromBody] RatingPut ratingModel)
 		{
 			var ratingId = await _bookService.AddRatingAsync(id, ratingModel);
 
-			if (ratingId ==  -1)
+			if (ratingId == -1)
 			{
 				return NotFound();
 			}
-
-			return Ok(new  RatingCreated{ Id = ratingId });
+      
+			return Ok(new RatingCreated { Id = ratingId });
 		}
 	}
 }
