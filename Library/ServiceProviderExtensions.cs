@@ -1,11 +1,14 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
-using Library.Configuration;
 using Library.Validation;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Repository;
 using Repository.Interfaces;
 using Service;
 using Service.Interfaces;
+using Shared.Configuration;
 using Shared.DTO.Incoming;
 using System.Xml.Serialization;
 
@@ -15,17 +18,17 @@ namespace Library
 	{
 		public static void AddBookService(this IServiceCollection services)
 		{
-			services.AddScoped<IBookService, BookService>();
+			services.AddTransient<IBookService, BookService>();
 		}
 
 		public static void AddRecomendedService(this IServiceCollection services)
 		{
-			services.AddScoped<IRecomendedService, RecomendedService>();
+			services.AddTransient<IRecomendedService, RecomendedService>();
 		}
 
 		public static void AddRepository(this IServiceCollection services)
 		{
-			services.AddSingleton<IBookRepository, BookRepository>();
+			services.AddTransient<IBookRepository, BookRepository>();
 		}
 
 		public static void AddAutomapper(this IServiceCollection services)
@@ -48,6 +51,16 @@ namespace Library
 		public static void ConfigureConfig(this IServiceCollection services, WebApplicationBuilder builder)
 		{
 			services.Configure<Config>(builder.Configuration.GetSection("Configuration"));
+		}
+
+		public static void AddCorsWithOpt(this IServiceCollection services)
+		{
+			services.AddCors(options => {
+				options.AddPolicy(
+					name: "CORSOpenPolicy",
+					builder => builder.WithOrigins("*").AllowAnyHeader().AllowAnyMethod()
+					);
+			});
 		}
 	}
 }

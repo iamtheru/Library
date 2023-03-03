@@ -10,6 +10,8 @@
 
 		public decimal Rating { get; set; }
 
+		public string Cover { get; set; }
+
 		public int ReviewsNumber { get; set; }
 	}
 }

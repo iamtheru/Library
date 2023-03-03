@@ -17,7 +17,7 @@ builder.Services.AddAutomapper();
 builder.Services.AddValidation();
 builder.Services.AddValidationRuls();
 builder.Services.ConfigureConfig(builder);
-
+builder.Services.AddCorsWithOpt();
 
 var app = builder.Build();
 
@@ -27,6 +27,8 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
+
+app.UseCors("CORSOpenPolicy");
 
 app.UseExceptionHandler("/api/error");
 

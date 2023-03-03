@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Repository.EntitiesConfiguration;
 using Repository.Interfaces;
+using Shared.Configuration;
 using Shared.RepositoryEntities;
 using Order = Shared.SortState.BookOrder;
 
@@ -8,17 +10,19 @@ namespace Repository
 {
 	public class BookRepository : DbContext, IBookRepository
 	{
+		private readonly string _connection;
+
 		private DbSet<Review> Reviews { get; set; }
 
 		private DbSet<Book> Books { get; set; }
 
 		private DbSet<Rating> Ratings { get; set; }
 
-		public BookRepository()
+
+
+		public BookRepository(IOptions<Config> options)
 		{
-			Database.EnsureDeleted();
-			Database.EnsureCreated();
-			InitRepo();
+			_connection = options.Value.DefaultConnection;
 		}
 
 		public async Task<List<Book>> GetAllBooksAsync(Order order)
@@ -116,7 +120,8 @@ namespace Repository
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
-			optionsBuilder.UseInMemoryDatabase("LibraryDB");
+			optionsBuilder.UseNpgsql(_connection);
+			//optionsBuilder.UseInMemoryDatabase("LibraryDB");
 		}
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -124,38 +129,6 @@ namespace Repository
 			modelBuilder.ApplyConfiguration(new BookConfiguration());
 			modelBuilder.ApplyConfiguration(new ReviewConfiguration());
 			modelBuilder.ApplyConfiguration(new RatingConfiguration());
-		}
-
-		private void InitRepo()
-		{
-			var alphabet = "ABCDEFGHIJKLMOPQRSTUWXY";
-			var intRandom = new Random();
-			for (int i = 0; i < 12; i++)
-			{
-				Books.Add(new Book
-				{
-					Title = $"{alphabet[i]}",
-					Content = $"Content-{i}",
-					Cover = $"Cover-{i}",
-					Author = $"{alphabet[alphabet.Length -1 - i]}",
-					Genre = i > 5 ? "Classic" : "Fiction"
-				});
-
-				for (int j = 0; j < 20; j++)
-				{
-					Ratings.Add(new Rating { BookId = i + 1, Score = intRandom.Next(1, 5) });
-				}
-
-				if(i > 4)
-				{
-					for (int x = 0; x < 11; x++)
-					{
-						Reviews.Add(new Review { BookId = i + 1, Reviewer = $"Reviewer-{i}", Message = $"Message-{i}" });
-					}
-				}
-			}
-
-			SaveChanges();
 		}
 	}
 }

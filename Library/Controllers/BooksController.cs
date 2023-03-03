@@ -1,9 +1,9 @@
-using Library.Configuration;
 using Library.Validation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Service.Interfaces;
 using Shared;
+using Shared.Configuration;
 using Shared.DTO.Incoming;
 using Shared.DTO.Outcoming;
 using System.ComponentModel.DataAnnotations;
